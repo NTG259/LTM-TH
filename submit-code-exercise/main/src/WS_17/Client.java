@@ -1,4 +1,4 @@
-package WS;
+package WS_17;
 
 import java.io.*;
 import java.net.*;

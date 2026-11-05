@@ -15,11 +15,11 @@ public class RMIClientByte2 {
         String serviceName = "RMIByteService";
 
         try {
-            // Kết nối Registry và lookup service
             Registry registry = LocateRegistry.getRegistry(serverIp, port);
+
             ByteService service = (ByteService) registry.lookup(serviceName);
 
-            // Bước a: Nhận mảng dữ liệu byte[] từ server
+            //Nhận mảng byte từ server
             byte[] rawData = service.requestData(studentCode, qCode);
             System.out.println("Received bytes length: " + (rawData != null ? rawData.length : 0));
 
@@ -27,22 +27,21 @@ public class RMIClientByte2 {
                 return;
             }
 
-            // Bước b: Tìm phần tử có tần suất xuất hiện nhiều nhất (ưu tiên gặp đầu tiên)
             byte[] result = findMostFrequentElement(rawData);
             System.out.println("Most frequent byte: " + result[0] + ", count: " + result[1]);
 
-            // Bước c: Gửi mảng byte kết quả [phần tử, số lần xuất hiện]
+            // Gửi kết quả về server;
             service.submitData(studentCode, qCode, result);
             System.out.println("Submitted data successfully.");
 
-            // Bước d: Kết thúc chương trình
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Nhận byte[] (dữ liệu gốc), trả về byte[] (2 phần tử).
+    //   Trả về byte[] để có thể truyền trực tiếp vào submitData(byte[]) mà không cần chuyển đổi.
     private static byte[] findMostFrequentElement(byte[] data) {
-        // LinkedHashMap giữ nguyên thứ tự xuất hiện đầu tiên của các byte
         Map<Byte, Integer> freqMap = new LinkedHashMap<>();
 
         for (byte b : data) {
@@ -52,7 +51,6 @@ public class RMIClientByte2 {
         byte mostFreqByte = data[0];
         int maxCount = -1;
 
-        // Dùng dấu '>' (không dùng '>=') để ưu tiên giữ lại phần tử xuất hiện trước
         for (Map.Entry<Byte, Integer> entry : freqMap.entrySet()) {
             if (entry.getValue() > maxCount) {
                 maxCount = entry.getValue();
@@ -60,6 +58,9 @@ public class RMIClientByte2 {
             }
         }
 
-        return new byte[]{mostFreqByte, (byte) maxCount};
+        byte[] result = new byte[2];
+        result[0] = mostFreqByte;
+        result[1] = (byte) maxCount;
+        return result;
     }
 }

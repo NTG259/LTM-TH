@@ -15,13 +15,11 @@ public class RMIClientByte {
         String serviceName = "RMIByteService";
 
         try {
-            // Kết nối tới RMI Registry trên server
             Registry registry = LocateRegistry.getRegistry(serverIp, port);
 
-            // Lookup đối tượng từ xa theo tên đã đăng ký
             ByteService service = (ByteService) registry.lookup(serviceName);
 
-            // Bước a: Triệu gọi requestData để lấy mảng byte
+            //Nhận mảng byte từ server
             byte[] rawData = service.requestData(studentCode, qCode);
             System.out.println("Received byte array length: " + (rawData != null ? rawData.length : 0));
 
@@ -30,23 +28,20 @@ public class RMIClientByte {
                 return;
             }
 
-            // Bước b: Tìm phần tử có số lần xuất hiện ít nhất (ưu tiên phần tử gặp đầu tiên)
+            //Tìm phần tử xuất hiện ít nhất
             byte[] result = findLeastFrequentElement(rawData);
             System.out.println("Result: value = " + result[0] + ", count = " + result[1]);
 
-            // Bước c: Triệu gọi submitData để gửi kết quả trở lại server
+            // Gửi kết quả về server
             service.submitData(studentCode, qCode, result);
             System.out.println("Submitted successfully!");
 
-            // Bước d: Kết thúc chương trình client
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Dùng LinkedHashMap để đếm tần suất và giữ nguyên thứ tự xuất hiện ban đầu
-     */
+
     private static byte[] findLeastFrequentElement(byte[] data) {
         Map<Byte, Integer> freqMap = new LinkedHashMap<>();
 
