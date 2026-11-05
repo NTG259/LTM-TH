@@ -1,0 +1,33 @@
+import java.util.*;
+import ptit.dblab.judge.network.server.soap.*;
+
+public class WS_SortEmployee {
+    public static void main(String[] args) {
+        // Khởi tạo service và port từ mã tự sinh
+        ObjectService service = new ObjectService();
+        SoapObjectService sv = service.getSoapObjectServicePort();
+
+        String studentCode = "B23DCCN259";
+        String qCode = "8U6N1FSZ"; // Thay mã câu hỏi thực tế
+
+        // Bước a: Nhận danh sách EmployeeY
+        List<EmployeeY> list = sv.requestListEmployeeY(studentCode, qCode);
+
+        // Bước b: Sắp xếp danh sách thâm niên từ cao đến thấp (ngày bắt đầu CŨ NHẤT đứng đầu)
+            list.sort((e1, e2) -> {
+                // Mặc định wsimport sinh kiểu ngày là XMLGregorianCalendar
+                // Ta chuyển về GregorianCalendar để so sánh (ngày cũ hơn sẽ nhỏ hơn -> sắp xếp tăng dần)
+                return e1.getStartDate().toGregorianCalendar()
+                         .compareTo(e2.getStartDate().toGregorianCalendar());
+
+                /*
+                 * MẸO: Nếu đề thi PTIT đã map sẵn kiểu này về java.util.Date (hiếm gặp),
+                 * bạn chỉ cần sửa lại thành:
+                 * return e1.getStartDate().compareTo(e2.getStartDate());
+                 */
+            });
+
+        // Bước c: Gửi lại danh sách đã sắp xếp về server
+        sv.submitListEmployeeY(studentCode, qCode, list);
+    }
+}

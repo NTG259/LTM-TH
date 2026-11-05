@@ -1,0 +1,25 @@
+import java.util.*;
+import ptit.dblab.judge.network.server.soap.*;
+
+public class WS_FilterCustomer {
+    public static void main(String[] args) {
+        // Khởi tạo service và port từ mã tự sinh
+        ObjectService service = new ObjectService();
+        SoapObjectService sv = service.getSoapObjectServicePort();
+
+        String studentCode = "B23DCCN259";
+        String qCode = "8POLIqFZ"; // Điền mã câu hỏi thực tế vào đây
+
+        // Bước a: Nhận danh sách Customer
+        List<Customer> list = sv.requestListCustomer(studentCode, qCode);
+
+        // Bước b: Lọc khách hàng (totalSpent > 5000 và purchaseCount >= 5)
+        if (list != null) {
+            // Dùng removeIf để xóa những khách hàng KHÔNG thỏa mãn điều kiện
+            list.removeIf(c -> c.getTotalSpent() <= 5000 || c.getPurchaseCount() < 5);
+        }
+
+        // Bước c: Gửi danh sách khách hàng tiềm năng trở lại server
+        sv.submitListCustomer(studentCode, qCode, list);
+    }
+}

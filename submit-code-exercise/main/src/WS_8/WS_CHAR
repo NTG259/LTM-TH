@@ -1,0 +1,31 @@
+import java.util.*;
+import ptit.dblab.judge.network.server.soap.*;
+
+public class WS_CharacterRotate {
+    public static void main(String[] args) {
+        // Khởi tạo service và port từ mã tự sinh
+        CharacterService service = new CharacterService();
+        SoapCharacterService sv = service.getSoapCharacterServicePort();
+
+        String studentCode = "B23DCCN259";
+        String qCode = "bKsgIClS";
+
+        // Bước a: Nhận danh sách ký tự (dưới dạng mã ASCII Integer)
+        List<Integer> data = sv.requestCharacter(studentCode, qCode);
+
+        // Bước b: Xoay vòng mảng sang phải
+        if (data != null && !data.isEmpty()) {
+            int n = data.size();
+            int k = data.get(0); // Lấy giá trị ASCII của ký tự đầu tiên
+
+            // Tính số lần xoay thực tế (chia lấy dư cho độ dài mảng để tối ưu)
+            int rotations = k % n;
+
+            // Collections.rotate thực hiện xoay vòng phải (right rotation) tự động
+            Collections.rotate(data, rotations);
+        }
+
+        // Bước c: Gửi lại mảng đã xoay vòng về server
+        sv.submitCharacterCharArray(studentCode, qCode, data);
+    }
+}
